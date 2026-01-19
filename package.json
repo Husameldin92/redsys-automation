@@ -1,0 +1,27 @@
+{
+  "name": "redsys-automation",
+  "version": "1.0.0",
+  "description": "Cypress E2E tests for RedSys CMS automation",
+  "main": "index.js",
+  "scripts": {
+    "open": "cypress open",
+    "test": "cypress run",
+    "test:headed": "cypress run --headed",
+    "test:chrome": "cypress run --browser chrome",
+    "test:record": "cypress run --record"
+  },
+  "keywords": [
+    "cypress",
+    "e2e",
+    "testing",
+    "automation"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "cypress": "^13.6.0"
+  },
+  "cypress-cucumber-preprocessor": {
+    "nonGlobalStepDefinitions": true
+  }
+}
