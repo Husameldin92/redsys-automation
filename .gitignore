@@ -40,3 +40,5 @@ results/
 # Coverage
 coverage/
 .nyc_output/
+
+.specstory/

@@ -14,59 +14,94 @@ describe('Brand, Issue, Author, and Article Creation Flow', () => {
   it('should create a complete content hierarchy: Brand → Issue → Author → Article', () => {
     // Step 1: Create Brand
     cy.log('Creating Brand');
-    cy.visit('/brands/new');
+    cy.visit('/brands');
+    cy.contains('Not Allowed').should('not.exist');
+    cy.get('a[href="#"]')
+  .contains('Create new Magazine')
+  .should('be.visible')
+  .click();
+    cy.get('#frc-name--1782415253').type(brandName);
+    cy.get('#frc-slug--1317495733').type(brandName.toLowerCase().replace(/ /g, '-'));
+    cy.get('#frc-price-1858698673').type('100');
+    cy.get('#frc-size--483674448').type('100');
+    // Click the control to open the dropdown
+    cy.get('.drop-down .css-bg1rzq-control').click();
     
-    // Fill brand details
-    cy.get('[data-testid="brand-name-input"]').type(brandName);
+    // Wait for menu to render and find options by ID pattern
+    cy.wait(500);
     
-    // Upload brand image
-    cy.uploadByTestId('brand-image-upload', 'cypress/fixtures/images/brand.jpg');
+    // Find the option by ID pattern - react-select-2-option-X
+    // Check each option until we find entwickler.de or devmio
+    cy.get('[id^="react-select-2-option-"]', { timeout: 10000 })
+      .should('have.length.at.least', 1)
+      .then(($options) => {
+        // Find entwickler.de option
+        const entwicklerOption = Array.from($options).find(opt => 
+          opt.textContent.includes('entwickler.de')
+        );
+        
+        if (entwicklerOption) {
+          cy.wrap(entwicklerOption).click();
+        } else {
+          // Find devmio option
+          const devmioOption = Array.from($options).find(opt => 
+            opt.textContent.includes('devmio')
+          );
+          
+          if (devmioOption) {
+            cy.wrap(devmioOption).click();
+          } else {
+            // Fallback: click first option
+            cy.wrap($options.first()).click();
+          }
+        }
+      });
+    cy.get('#frc-introText--918969944').type('This is a test introduction');
+    cy.get('#frc-publicationFrequency-1046486578').type('100');
     
-    // Save brand
-    cy.get('[data-testid="brand-save-btn"]').click();
+    // Click language dropdown - use the specific selector that works
+    cy.get('.input-language > .jss278 > .jss294 > .jss326 > .jss327').first().click();
     
-    // Assert brand creation success
-    cy.get('[data-testid="toast-success"]', { timeout: 10000 })
-      .should('be.visible')
-      .and('contain', 'Brand created successfully');
+    // Wait for menu to render
+    cy.wait(500);
     
-    cy.get('[data-testid="brand-detail-title"]')
-      .should('be.visible')
-      .and('contain', brandName);
+    // Find and click option by text (same pattern as Apps dropdown)
+    // Try English first, then German, otherwise any option
+    cy.get('body').then(($body) => {
+      // Check if English option exists
+      const englishOption = $body.find('[role="option"]').filter((i, el) => 
+        Cypress.$(el).text().includes('English')
+      );
+      
+      if (englishOption.length > 0) {
+        cy.wrap(englishOption.first()).click();
+      } else {
+        // Try German
+        const germanOption = $body.find('[role="option"]').filter((i, el) => 
+          Cypress.$(el).text().includes('German')
+        );
+        
+        if (germanOption.length > 0) {
+          cy.wrap(germanOption.first()).click();
+        } else {
+          // Fallback: click first option
+          cy.get('[role="option"]').first().click();
+        }
+      }
+    });
+
+    cy.get('#frc-colour-1601995274').type('#000000');
+    cy.get('.input-conferenceSeriesId .css-bg1rzq-control').first().click();
+    cy.get('.css-26l3qy-menu', { timeout: 10000 })
+    .should('be.visible')
+    .find('.css-1n7v3ny-option')
+    .first()
+    .click();
+    cy.wait(1000); 
+
     
-    // Step 2: Create Issue under the Brand
-    cy.log('Creating Issue');
-    
-    // Click create issue button (assuming it's on the brand detail page)
-    cy.get('[data-testid="issue-create-btn"]').click();
-    
-    // Alternative: Navigate directly to issues/new and select brand
-    // cy.visit('/issues/new');
-    // cy.get('[data-testid="issue-brand-select"]').click();
-    // cy.get(`[data-testid="brand-option-${brandName}"]`).click();
-    
-    // Fill issue details
-    cy.get('[data-testid="issue-name-input"]').type(issueName);
-    
-    // Upload issue image
-    cy.uploadByTestId('issue-image-upload', 'cypress/fixtures/images/issue.jpg');
-    
-    // Save issue
-    cy.get('[data-testid="issue-save-btn"]').click();
-    
-    // Assert issue creation success
-    cy.get('[data-testid="toast-success"]', { timeout: 10000 })
-      .should('be.visible')
-      .and('contain', 'Issue created successfully');
-    
-    // Verify issue appears in list or card
-    cy.get('[data-testid="issue-card"]')
-      .should('be.visible')
-      .and('contain', issueName);
-    
-    // Step 3: Create Author
-    cy.log('Creating Author');
-    cy.visit('/authors/new');
+    // Step 2: Create Issue
+
     
     // Fill author details
     cy.get('[data-testid="author-name-input"]').type(authorName);

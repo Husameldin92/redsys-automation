@@ -5,7 +5,7 @@ module.exports = defineConfig({
     baseUrl: 'https://redsys-stage.sandsmedia.com/', 
     viewportWidth: 1280,
     viewportHeight: 720,
-    video: true,
+    video: false,
     videoCompression: 32,
     videosFolder: 'cypress/videos',
     screenshotsFolder: 'cypress/screenshots',
@@ -18,6 +18,7 @@ module.exports = defineConfig({
     responseTimeout: 10000,
     pageLoadTimeout: 30000,
     chromeWebSecurity: false,
+    watchForFileChanges: false,
     setupNodeEvents(on, config) {
       // implement node event listeners here
     },

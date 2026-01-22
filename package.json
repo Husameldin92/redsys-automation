@@ -16,10 +16,10 @@
     "testing",
     "automation"
   ],
-  "author": "",
+  "author": "Husam",
   "license": "ISC",
   "devDependencies": {
-    "cypress": "^13.6.0"
+    "cypress": "14.5.1"
   },
   "cypress-cucumber-preprocessor": {
     "nonGlobalStepDefinitions": true
