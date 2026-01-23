@@ -186,19 +186,20 @@ describe('Issue Creation', () => {
         .should('be.visible')
         .click();
       
-      // Wait for article form to load
-      cy.wait(2000);
+      // Wait for article form to load (takes time)
+      cy.wait(3000);
       
       // Scroll down and select "standard" from type dropdown
       cy.log('Selecting article type: standard');
       cy.get('.input-type > .jss770 > .jss791 > .jss786 > .jss787')
+        .first() // Ensure we only get one element
         .scrollIntoView()
         .should('be.visible')
         .click();
-      cy.wait(500);
+      cy.wait(1000); // Increased wait
       // Select first option (standard)
       cy.get('[role="option"]').first().click();
-      cy.wait(500);
+      cy.wait(1000); // Increased wait
       
       // Leave author empty (will be filled later)
       cy.log('Skipping author field (will be filled later)');
@@ -209,6 +210,7 @@ describe('Issue Creation', () => {
         .should('be.visible')
         .clear()
         .type(`E2E Article Headline ${timestamp}`);
+      cy.wait(500); // Wait after filling
       
       // Fill Subtitle
       cy.log('Filling Subtitle');
@@ -216,6 +218,7 @@ describe('Issue Creation', () => {
         .should('be.visible')
         .clear()
         .type(`E2E Article Subtitle ${timestamp}`);
+      cy.wait(500); // Wait after filling
       
       // Fill Slug
       cy.log('Filling Slug');
@@ -223,22 +226,24 @@ describe('Issue Creation', () => {
         .should('be.visible')
         .clear()
         .type(`e2e-article-${timestamp}`);
+      cy.wait(500); // Wait after filling
       
       // Select Primary Category dropdown (second option - first is empty)
       cy.log('Selecting Primary Category');
       cy.get('.input-primaryCategoryId > .jss770 > .jss791 > .jss786 > .jss787')
+        .first() // Ensure we only get one element
         .should('be.visible')
         .click();
-      cy.wait(500);
+      cy.wait(1000); // Increased wait
       cy.get('[role="option"]').eq(1).click(); // Select second option (index 1)
-      cy.wait(500);
+      cy.wait(1000); // Increased wait
       
       // Select Topics dropdown (first option)
       cy.log('Selecting Topics');
       cy.get('.input-categoryIds > .form-group > .drop-down > .css-1pcexqc-container > .css-bg1rzq-control > .css-1hwfws3')
         .should('be.visible')
         .click();
-      cy.wait(500);
+      cy.wait(1000); // Increased wait
       // Find and click first option in Topics dropdown
       cy.get('body').then(($body) => {
         const topicOption = $body.find('[id^="react-select-"][id*="-option-"], [role="option"]')
@@ -250,17 +255,18 @@ describe('Issue Creation', () => {
           cy.selectReactSelectOption('.input-categoryIds .css-bg1rzq-control', null);
         }
       });
-      cy.wait(500);
+      cy.wait(1000); // Increased wait
       
       // Save the article (Speichern)
       cy.log('Saving article');
       cy.get('button.submit-button[type="submit"]')
+        .first() // Ensure we only get one element
         .scrollIntoView()
         .should('contain', 'Speichern')
         .click();
       
-      // Wait for save to complete and check we're still logged in
-      cy.wait(2000);
+      // Wait for save to complete and check we're still logged in (takes time)
+      cy.wait(4000); // Increased wait after saving article
       
       // Verify we're still logged in - check URL and page content
       cy.url().should('not.include', '/login');
@@ -269,68 +275,60 @@ describe('Issue Creation', () => {
       
       // Step 6: Edit article to upload images
       cy.log('Clicking Edit button for article');
-      // Wait a bit for the page to fully load
-      cy.wait(1000);
-      
-      // Find and click the edit button - try multiple selectors
-      cy.get('.modal-trigger.jss196 button, .jss196 button.button, button.jss32.jss176.button', { timeout: 10000 })
-        .first()
-        .scrollIntoView()
-        .should('be.visible')
-        .click();
-      
-      // Wait for edit form to load (takes a few seconds)
+      // Wait longer for the page to fully load after article creation
       cy.wait(3000);
       
-      // Upload teaser image (same as brand teaser)
-      cy.log('Uploading article teaser image');
-      cy.get('body').then(($body) => {
-        // Find the first dropzone (teaser) - scroll into view first
-        const teaserDropzone = $body.find('.dropzone-base').first();
-        if (teaserDropzone.length > 0) {
-          cy.wrap(teaserDropzone)
-            .scrollIntoView()
-            .within(() => {
-              cy.get('input[type="file"]').selectFile('cypress/fixtures/images/brand-generic-teaser.jpg', { force: true });
-            });
-          cy.wait(1000);
-        }
-      });
+      // Find and click the edit button using the specific selector
+      cy.get('[style="width: 4.54545%; height: 64px; padding: 0px;"] > .jss1033 > div', { timeout: 15000 })
+        .first() // Ensure we only get one element
+        .should('be.visible')
+        .scrollIntoView()
+        .click();
       
-      // Upload HTML file
-      cy.log('Uploading article HTML file');
-      cy.get('body').then(($body) => {
-        // Find the second dropzone (HTML) - scroll into view first
-        const htmlDropzones = $body.find('.dropzone-base');
-        if (htmlDropzones.length > 1) {
-          // Use the second dropzone for HTML
-          cy.wrap(htmlDropzones.eq(1))
-            .scrollIntoView()
-            .within(() => {
-              cy.get('input[type="file"]').selectFile('cypress/fixtures/images/article.html', { force: true });
-            });
-          cy.wait(1000);
-        } else {
-          // Fallback: if only one dropzone found, try to find HTML-specific one
-          cy.get('.dropzone-base')
-            .last()
-            .scrollIntoView()
-            .within(() => {
-              cy.get('input[type="file"]').selectFile('cypress/fixtures/images/article.html', { force: true });
-            });
-          cy.wait(1000);
-        }
+      // Wait longer for edit form to load (takes time to open)
+      cy.log('Waiting for edit form to load...');
+      cy.wait(10000); // Increased wait time after clicking edit (10 seconds)
+      
+      // Wait more for form to be fully ready
+      cy.wait(3000);
+      
+      // Upload teaser image to Images dropzone (first dropzone)
+      cy.log('Uploading article teaser image to Images dropzone');
+      // Ensure we only get one element - use first() before scrollIntoView
+      cy.get('.dropzone-base').first().then(($dropzone) => {
+        cy.wrap($dropzone)
+          .scrollIntoView({ duration: 1000 })
+          .should('exist')
+          .within(() => {
+            cy.get('input[type="file"]').selectFile('cypress/fixtures/images/brand-generic-teaser.jpg', { force: true });
+          });
       });
+      cy.wait(2000); // Increased wait after upload
+      
+      // Upload HTML file to HTML-Uploaded dropzone using exact selector
+      cy.log('Uploading article HTML file to HTML-Uploaded dropzone');
+      cy.get(':nth-child(10) > .jss1100 > .jss1102 > .jss1103 > .jss1038 > .jss1104 > .form-group > .col-sm-9 > .dropzone-base', { timeout: 15000 })
+        .should('exist')
+        .then(($dropzone) => {
+          // Ensure we only scroll one element
+          cy.wrap($dropzone)
+            .scrollIntoView({ duration: 1000 })
+            .within(() => {
+              cy.get('input[type="file"]').selectFile('cypress/fixtures/images/report.html', { force: true });
+            });
+        });
+      cy.wait(2000); // Increased wait after upload
       
       // Save the article edits (Speichern)
       cy.log('Saving article edits');
       cy.get('button.submit-button[type="submit"]')
+        .first() // Ensure we only get one element
         .scrollIntoView()
         .should('contain', 'Speichern')
         .click();
       
-      // Wait for save to complete and check we're still logged in
-      cy.wait(2000);
+      // Wait for save to complete and check we're still logged in (takes time)
+      cy.wait(4000); // Increased wait after saving edits
       
       // Verify we're still logged in - check URL and page content
       cy.url().should('not.include', '/login');
