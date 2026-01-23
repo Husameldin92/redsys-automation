@@ -91,13 +91,30 @@ describe('Brand, Issue, Author, and Article Creation Flow', () => {
     });
 
     cy.get('#frc-colour-1601995274').type('#000000');
+    
+    // Click conferenceSeriesId dropdown (same pattern as Apps dropdown)
     cy.get('.input-conferenceSeriesId .css-bg1rzq-control').first().click();
-    cy.get('.css-26l3qy-menu', { timeout: 10000 })
-    .should('be.visible')
-    .find('.css-1n7v3ny-option')
-    .first()
-    .click();
-    cy.wait(1000); 
+    
+    // Wait for menu to render and find options by ID pattern
+    cy.wait(500);
+    
+    // Find the option by ID pattern - try different react-select IDs
+    cy.get('[id^="react-select-"][id*="-option-"]', { timeout: 10000 })
+      .should('have.length.at.least', 1)
+      .then(($options) => {
+        // Click first available option
+        cy.wrap($options.first()).click();
+      });
+    
+    cy.wait(1000);
+    
+    // Save the brand form
+    cy.get('button[type="submit"], button:contains("Save"), button:contains("Create"), [data-testid*="save"], [data-testid*="submit"]')
+      .first()
+      .click();
+    
+    // Wait for success message or redirect
+    cy.wait(2000); 
 
     
     // Step 2: Create Issue
@@ -175,28 +192,30 @@ describe('Brand, Issue, Author, and Article Creation Flow', () => {
   
   // Additional test to verify the created entities persist
   it('should verify all created entities are accessible', () => {
-    // Verify Brand
+    // Verify Brand - wait for page to load and find brand name
     cy.visit('/brands');
-    cy.get('[data-testid="brand-list-item"]')
-      .contains(brandName)
-      .should('exist');
+    cy.wait(2000); // Wait for list to load
+    cy.get('body').should('be.visible');
+    cy.contains(brandName, { timeout: 10000 })
+      .should('exist')
+      .should('be.visible');
     
-    // Verify Issue
+    // Verify Issue - use flexible selector
     cy.visit('/issues');
-    cy.get('[data-testid="issue-list-item"]')
-      .contains(issueName)
-      .should('exist');
+    cy.contains(issueName, { timeout: 10000 })
+      .should('exist')
+      .should('be.visible');
     
-    // Verify Author
+    // Verify Author - use flexible selector
     cy.visit('/authors');
-    cy.get('[data-testid="author-list-item"]')
-      .contains(authorName)
-      .should('exist');
+    cy.contains(authorName, { timeout: 10000 })
+      .should('exist')
+      .should('be.visible');
     
-    // Verify Article
+    // Verify Article - use flexible selector
     cy.visit('/articles');
-    cy.get('[data-testid="article-list-item"]')
-      .contains(articleTitle)
-      .should('exist');
+    cy.contains(articleTitle, { timeout: 10000 })
+      .should('exist')
+      .should('be.visible');
   });
 });

@@ -2,6 +2,10 @@
 import './commands/auth';
 import './commands/upload';
 
+// Import helpers
+import './helpers/dropdowns';
+import './helpers/images';
+
 // List of errors to ignore (known application issues that don't affect tests)
 const ignoredErrors = [
   'xhr-sync-worker.js',

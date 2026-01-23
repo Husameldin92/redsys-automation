@@ -5,10 +5,16 @@
   "main": "index.js",
   "scripts": {
     "open": "cypress open",
+    "open:electron": "cypress open --browser electron",
     "test": "cypress run",
     "test:headed": "cypress run --headed",
     "test:chrome": "cypress run --browser chrome",
-    "test:record": "cypress run --record"
+    "test:record": "cypress run --record",
+    "test:brand": "cypress run --spec 'cypress/e2e/brand.cy.js'",
+    "test:issue": "cypress run --spec 'cypress/e2e/issue.cy.js'",
+    "test:author": "cypress run --spec 'cypress/e2e/author.cy.js'",
+    "test:article": "cypress run --spec 'cypress/e2e/article.cy.js'",
+    "test:all": "cypress run --spec 'cypress/e2e/{brand,issue,author,article}.cy.js'"
   },
   "keywords": [
     "cypress",
