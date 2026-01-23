@@ -5,6 +5,7 @@ import './commands/upload';
 // Import helpers
 import './helpers/dropdowns';
 import './helpers/images';
+import './helpers/test-data';
 
 // List of errors to ignore (known application issues that don't affect tests)
 const ignoredErrors = [

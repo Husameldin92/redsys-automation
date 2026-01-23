@@ -132,6 +132,9 @@ describe('Brand Creation and Management', () => {
     cy.url().should('not.include', '/auth');
     cy.get('body').should('not.contain', 'Not Allowed');
     
+    // Store the brand name for use in issue creation test
+    cy.storeLastCreatedBrand(brandName);
+    
     // Test complete - brand created and edited successfully, still logged in
   });
 });

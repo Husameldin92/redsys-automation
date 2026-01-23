@@ -37,6 +37,9 @@ results/
 *.tmp
 *.temp
 
+# Test data files (generated during test runs)
+cypress/fixtures/last-created-brand.json
+
 # Coverage
 coverage/
 .nyc_output/
