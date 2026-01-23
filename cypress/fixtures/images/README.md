@@ -7,11 +7,11 @@ This directory contains images used for testing file uploads in Cypress tests.
 Create the following images with these exact names:
 
 ### Brand Images
-- `brand-logo.jpg` - Logo image for brands
-- `brand-transparent-logo.png` - Transparent logo image for brands (PNG format)
-- `brand-header.jpg` - Header image for brands
-- `brand-issue-background.jpg` - Issue background image for brands
-- `brand-article-overlay.jpg` - Article overlay image for brands
+- `brand-logo.png` - Logo image for brands
+- `brand-transparent-logo.svg` - Transparent logo image for brands (SVG format)
+- `brand-header.png` - Header image for brands
+- `brand-issue-background.png` - Issue background image for brands
+- `brand-article-overlay.png` - Article overlay image for brands
 - `brand-generic-teaser.jpg` - Generic teaser image for brands (2048 x 848 pixels, JPG or PNG)
 
 ### Issue Images
@@ -32,7 +32,7 @@ Create the following images with these exact names:
 
 ## Image Specifications
 
-- **Format**: JPG/JPEG (PNG for transparent logo)
+- **Format**: PNG, JPG/JPEG, SVG (various formats supported)
 - **Size**: 
   - General images: Recommended 800x600px or larger
   - Generic Teaser: Must be 2048 x 848 pixels (JPG or PNG)

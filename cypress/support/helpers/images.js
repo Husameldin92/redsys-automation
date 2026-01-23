@@ -1,11 +1,11 @@
 // Image paths for different upload types
 const IMAGE_PATHS = {
   // Brand images
-  brandLogo: 'cypress/fixtures/images/brand-logo.jpg',
-  brandTransparentLogo: 'cypress/fixtures/images/brand-transparent-logo.png',
-  brandHeader: 'cypress/fixtures/images/brand-header.jpg',
-  brandIssueBackground: 'cypress/fixtures/images/brand-issue-background.jpg',
-  brandArticleOverlay: 'cypress/fixtures/images/brand-article-overlay.jpg',
+  brandLogo: 'cypress/fixtures/images/brand-logo.png',
+  brandTransparentLogo: 'cypress/fixtures/images/brand-transparent-logo.svg',
+  brandHeader: 'cypress/fixtures/images/brand-header.png',
+  brandIssueBackground: 'cypress/fixtures/images/brand-issue-background.png',
+  brandArticleOverlay: 'cypress/fixtures/images/brand-article-overlay.png',
   brandGenericTeaser: 'cypress/fixtures/images/brand-generic-teaser.jpg', // 2048 x 848
   
   // Issue images
@@ -44,6 +44,19 @@ Cypress.Commands.add('uploadImageByType', (testId, imageType) => {
  */
 Cypress.Commands.add('uploadImage', (testId, imagePath) => {
   cy.get(`[data-testid="${testId}"]`).selectFile(imagePath, { force: true });
+  cy.wait(500);
+});
+
+/**
+ * Upload an image to a dropzone by finding the file input within it
+ * @param {string} dropzoneSelector - Selector for the dropzone container
+ * @param {string} imagePath - Path to image file
+ */
+Cypress.Commands.add('uploadToDropzone', (dropzoneSelector, imagePath) => {
+  // Try to find file input within the dropzone
+  cy.get(dropzoneSelector).within(() => {
+    cy.get('input[type="file"]').selectFile(imagePath, { force: true });
+  });
   cy.wait(500);
 });
 
