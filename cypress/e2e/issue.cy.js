@@ -180,8 +180,165 @@ describe('Issue Creation', () => {
       cy.url().should('not.include', '/auth');
       cy.get('body').should('not.contain', 'Not Allowed');
       
-      // Test complete - issue created and edited successfully, still logged in
-      cy.log(`✅ Issue "${issueName}" created, edited, and connected to brand "${brandToUse}"`);
+      // Step 5: Create article for this issue
+      cy.log('Creating article for this issue');
+      cy.get(':nth-child(2) > :nth-child(1) > .jss508')
+        .should('be.visible')
+        .click();
+      
+      // Wait for article form to load
+      cy.wait(2000);
+      
+      // Scroll down and select "standard" from type dropdown
+      cy.log('Selecting article type: standard');
+      cy.get('.input-type > .jss770 > .jss791 > .jss786 > .jss787')
+        .scrollIntoView()
+        .should('be.visible')
+        .click();
+      cy.wait(500);
+      // Select first option (standard)
+      cy.get('[role="option"]').first().click();
+      cy.wait(500);
+      
+      // Leave author empty (will be filled later)
+      cy.log('Skipping author field (will be filled later)');
+      
+      // Fill Headline
+      cy.log('Filling Headline');
+      cy.get('#frc-name-324128130')
+        .should('be.visible')
+        .clear()
+        .type(`E2E Article Headline ${timestamp}`);
+      
+      // Fill Subtitle
+      cy.log('Filling Subtitle');
+      cy.get('#frc-subTitle-1141520574')
+        .should('be.visible')
+        .clear()
+        .type(`E2E Article Subtitle ${timestamp}`);
+      
+      // Fill Slug
+      cy.log('Filling Slug');
+      cy.get('#frc-slug-1053376469')
+        .should('be.visible')
+        .clear()
+        .type(`e2e-article-${timestamp}`);
+      
+      // Select Primary Category dropdown (second option - first is empty)
+      cy.log('Selecting Primary Category');
+      cy.get('.input-primaryCategoryId > .jss770 > .jss791 > .jss786 > .jss787')
+        .should('be.visible')
+        .click();
+      cy.wait(500);
+      cy.get('[role="option"]').eq(1).click(); // Select second option (index 1)
+      cy.wait(500);
+      
+      // Select Topics dropdown (first option)
+      cy.log('Selecting Topics');
+      cy.get('.input-categoryIds > .form-group > .drop-down > .css-1pcexqc-container > .css-bg1rzq-control > .css-1hwfws3')
+        .should('be.visible')
+        .click();
+      cy.wait(500);
+      // Find and click first option in Topics dropdown
+      cy.get('body').then(($body) => {
+        const topicOption = $body.find('[id^="react-select-"][id*="-option-"], [role="option"]')
+          .first();
+        if (topicOption.length > 0) {
+          cy.wrap(topicOption).click();
+        } else {
+          // Fallback: try React Select pattern
+          cy.selectReactSelectOption('.input-categoryIds .css-bg1rzq-control', null);
+        }
+      });
+      cy.wait(500);
+      
+      // Save the article (Speichern)
+      cy.log('Saving article');
+      cy.get('button.submit-button[type="submit"]')
+        .scrollIntoView()
+        .should('contain', 'Speichern')
+        .click();
+      
+      // Wait for save to complete and check we're still logged in
+      cy.wait(2000);
+      
+      // Verify we're still logged in - check URL and page content
+      cy.url().should('not.include', '/login');
+      cy.url().should('not.include', '/auth');
+      cy.get('body').should('not.contain', 'Not Allowed');
+      
+      // Step 6: Edit article to upload images
+      cy.log('Clicking Edit button for article');
+      // Wait a bit for the page to fully load
+      cy.wait(1000);
+      
+      // Find and click the edit button - try multiple selectors
+      cy.get('.modal-trigger.jss196 button, .jss196 button.button, button.jss32.jss176.button', { timeout: 10000 })
+        .first()
+        .scrollIntoView()
+        .should('be.visible')
+        .click();
+      
+      // Wait for edit form to load (takes a few seconds)
+      cy.wait(3000);
+      
+      // Upload teaser image (same as brand teaser)
+      cy.log('Uploading article teaser image');
+      cy.get('body').then(($body) => {
+        // Find the first dropzone (teaser) - scroll into view first
+        const teaserDropzone = $body.find('.dropzone-base').first();
+        if (teaserDropzone.length > 0) {
+          cy.wrap(teaserDropzone)
+            .scrollIntoView()
+            .within(() => {
+              cy.get('input[type="file"]').selectFile('cypress/fixtures/images/brand-generic-teaser.jpg', { force: true });
+            });
+          cy.wait(1000);
+        }
+      });
+      
+      // Upload HTML file
+      cy.log('Uploading article HTML file');
+      cy.get('body').then(($body) => {
+        // Find the second dropzone (HTML) - scroll into view first
+        const htmlDropzones = $body.find('.dropzone-base');
+        if (htmlDropzones.length > 1) {
+          // Use the second dropzone for HTML
+          cy.wrap(htmlDropzones.eq(1))
+            .scrollIntoView()
+            .within(() => {
+              cy.get('input[type="file"]').selectFile('cypress/fixtures/images/article.html', { force: true });
+            });
+          cy.wait(1000);
+        } else {
+          // Fallback: if only one dropzone found, try to find HTML-specific one
+          cy.get('.dropzone-base')
+            .last()
+            .scrollIntoView()
+            .within(() => {
+              cy.get('input[type="file"]').selectFile('cypress/fixtures/images/article.html', { force: true });
+            });
+          cy.wait(1000);
+        }
+      });
+      
+      // Save the article edits (Speichern)
+      cy.log('Saving article edits');
+      cy.get('button.submit-button[type="submit"]')
+        .scrollIntoView()
+        .should('contain', 'Speichern')
+        .click();
+      
+      // Wait for save to complete and check we're still logged in
+      cy.wait(2000);
+      
+      // Verify we're still logged in - check URL and page content
+      cy.url().should('not.include', '/login');
+      cy.url().should('not.include', '/auth');
+      cy.get('body').should('not.contain', 'Not Allowed');
+      
+      // Test complete - issue created, edited, article created and edited successfully, still logged in
+      cy.log(`✅ Issue "${issueName}" created, edited, article created and edited, connected to brand "${brandToUse}"`);
     });
   });
 });
