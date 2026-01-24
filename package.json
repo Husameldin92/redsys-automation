@@ -11,10 +11,10 @@
     "test:chrome": "cypress run --browser chrome",
     "test:record": "cypress run --record",
     "test:brand": "cypress run --spec 'cypress/e2e/brand.cy.js'",
-    "test:issue": "cypress run --spec 'cypress/e2e/issue.cy.js'",
     "test:author": "cypress run --spec 'cypress/e2e/author.cy.js'",
-    "test:article": "cypress run --spec 'cypress/e2e/article.cy.js'",
-    "test:all": "cypress run --spec 'cypress/e2e/{brand,issue,author,article}.cy.js'"
+    "test:issue-article": "cypress run --spec 'cypress/e2e/issue-article.cy.js'",
+    "test:full-flow": "cypress run --spec 'cypress/e2e/full-flow.cy.js'",
+    "test:all": "cypress run --spec 'cypress/e2e/{brand,author,issue-article}.cy.js'"
   },
   "keywords": [
     "cypress",

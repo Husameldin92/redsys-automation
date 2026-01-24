@@ -100,8 +100,18 @@ describe('Brand Creation and Management', () => {
     // Upload transparent logo
     uploadToDropzone('.input-transparentLogo', 'cypress/fixtures/images/brand-transparent-logo.svg');
     
-    // Upload header
-    uploadToDropzone('.input-header', 'cypress/fixtures/images/brand-header.png');
+    // Upload header - scroll into view first, then upload
+    cy.log('Uploading header image');
+    cy.get('.input-header', { timeout: 10000 })
+      .should('exist')
+      .scrollIntoView()
+      .should('be.visible')
+      .within(() => {
+        cy.get('input[type="file"]', { timeout: 5000 })
+          .should('exist')
+          .selectFile('cypress/fixtures/images/brand-header.png', { force: true });
+      });
+    cy.wait(3000); // Wait longer for header upload to complete
     
     // Upload issue background
     uploadToDropzone('.input-deepLinkIssueBackgroundImage', 'cypress/fixtures/images/brand-issue-background.png');

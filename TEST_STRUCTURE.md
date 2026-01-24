@@ -2,35 +2,82 @@
 
 ## Overview
 
-The test suite has been reorganized into separate test files for better maintainability and clarity. Each entity (Brand, Issue, Author, Article) now has its own dedicated test file.
+The test suite supports **two execution flows**:
+
+1. **Individual Tests**: Each entity can be run separately for focused testing
+2. **Full Sequential Flow**: Run brand → author → issue/article in one continuous test
 
 ## File Structure
 
 ```
 cypress/
 ├── e2e/
-│   ├── brand.cy.js          # Brand creation and management tests
-│   ├── issue.cy.js           # Issue creation tests
-│   ├── author.cy.js          # Author creation tests
-│   ├── article.cy.js         # Article creation tests
-│   └── brand-issue-author-article.cy.js  # Legacy combined test (can be removed)
+│   ├── brand.cy.js              # Brand creation and management tests (individual)
+│   ├── author.cy.js            # Author creation and publishing tests (individual)
+│   ├── issue-article.cy.js     # Issue and article creation/editing tests (individual)
+│   └── full-flow.cy.js         # Sequential flow: brand → author → issue/article
 │
 ├── support/
 │   ├── commands/
-│   │   ├── auth.js           # Authentication commands
-│   │   └── upload.js          # Basic upload command
+│   │   ├── auth.js             # Authentication commands
+│   │   └── upload.js           # Basic upload command
 │   │
 │   ├── helpers/
-│   │   ├── dropdowns.js      # Dropdown interaction helpers
-│   │   └── images.js          # Image upload helpers with named types
+│   │   ├── dropdowns.js        # Dropdown interaction helpers
+│   │   ├── images.js           # Image upload helpers with named types
+│   │   └── test-data.js        # Cross-test data sharing helpers
 │   │
-│   └── e2e.js                 # Global test configuration
+│   └── e2e.js                   # Global test configuration
 │
 └── fixtures/
-    └── images/
-        ├── README.md          # Image requirements documentation
-        └── [image files]      # Test images (see README.md for list)
+    ├── images/
+    │   ├── README.md            # Image requirements documentation
+    │   └── [image files]        # Test images (see README.md for list)
+    ├── last-created-brand.json  # Shared data: last created brand name
+    └── last-created-author.json # Shared data: last created author name
 ```
+
+## Test Execution Flows
+
+### Flow 1: Individual Tests (Default)
+
+Run each test file independently:
+
+```bash
+# Run individual tests
+npm run test:brand          # Brand creation and editing
+npm run test:author         # Author creation and publishing
+npm run test:issue-article  # Issue and article creation/editing
+
+# Or run all individual tests
+npm run test:all
+```
+
+**Characteristics:**
+- Each test file logs in independently
+- Tests can be run in any order
+- Data sharing via JSON fixtures (`last-created-brand.json`, `last-created-author.json`)
+- Useful for debugging specific entities
+
+### Flow 2: Full Sequential Flow
+
+Run the complete workflow in one test:
+
+```bash
+npm run test:full-flow
+```
+
+**Characteristics:**
+- Single login session for all steps
+- Runs in strict order: Brand → Author → Issue/Article
+- All entities are connected (brand linked to issue, author linked to article)
+- Faster execution (no repeated logins)
+- Useful for end-to-end validation
+
+**What it does:**
+1. **Step 1**: Creates brand, edits it, uploads all brand images
+2. **Step 2**: Creates author, uploads avatar, publishes author
+3. **Step 3**: Creates issue (connected to brand), creates article (connected to issue), edits article (connects author, uploads images), publishes everything
 
 ## Helper Functions
 
@@ -105,27 +152,42 @@ cy.uploadImage('custom-upload', 'cypress/fixtures/images/custom.jpg');
 Tests for brand creation and management:
 - Creates a new brand with all required fields
 - Edits brand and uploads images:
-  - LOGO
+  - Logo
   - Transparent Logo
   - Header
   - Issue background images
   - Article Overlay Image
   - Generic Teaser Image (2048 x 848)
-- Verifies brand exists in list
-
-### `issue.cy.js`
-Tests for issue creation (structure ready, needs implementation)
+- Stores brand name for use in issue tests (`cy.storeLastCreatedBrand()`)
 
 ### `author.cy.js`
-Tests for author creation:
-- Creates author with name and photo
-- Verifies author creation
+Tests for author creation and publishing:
+- Creates author with name, slug, forname, surname, company, and bios
+- Edits author to upload avatar image
+- Publishes the author
+- Stores author name for use in article tests (`cy.storeLastCreatedAuthor()`)
 
-### `article.cy.js`
-Tests for article creation:
-- Creates article with title and image
-- Can associate with author and issue
-- Verifies article creation
+### `issue-article.cy.js`
+Tests for issue and article creation/editing:
+- **Issue Creation**: Creates issue connected to last created brand
+  - Fills designation, slug, cover story, in-app purchase ID
+  - Selects publication date from calendar widget
+  - Edits issue to upload cover image
+- **Article Creation**: Creates article within the issue
+  - Selects article type (standard)
+  - Fills headline, subtitle, slug
+  - Selects primary category and topics
+- **Article Editing**: Edits article to connect author and upload images
+  - Connects to last created author
+  - Uploads teaser image and HTML file
+- **Publishing**: Publishes the issue (which publishes brand, issue, and article)
+
+### `full-flow.cy.js`
+Combines all three tests into a single sequential flow:
+- **Step 1**: Brand creation and editing (same as `brand.cy.js`)
+- **Step 2**: Author creation and publishing (same as `author.cy.js`)
+- **Step 3**: Issue/article creation, editing, and publishing (same as `issue-article.cy.js`)
+- All steps run in one test session with a single login
 
 ## Image Setup
 
@@ -134,16 +196,38 @@ Tests for article creation:
 3. Recommended size: 800x600px or larger
 4. Keep file sizes under 2MB
 
-## Migration Notes
+## Data Sharing Between Tests
 
-- The original `brand-issue-author-article.cy.js` file is kept for reference but can be removed once all tests are migrated
-- Each test file is independent and can be run separately
-- Shared helpers are imported automatically via `cypress/support/e2e.js`
+Tests share data using JSON fixture files:
 
-## Next Steps
+### `cypress/fixtures/last-created-brand.json`
+Stores the brand name created in `brand.cy.js` for use in `issue-article.cy.js`.
 
-1. **Complete Issue Tests**: Implement issue creation form interactions in `issue.cy.js`
-2. **Add Brand Edit Tests**: Complete the brand editing flow with all image uploads
-3. **Create Test Images**: Generate all required test images (see `cypress/fixtures/images/README.md`)
-4. **Update Selectors**: Replace any hardcoded selectors with data-testid attributes where possible
-5. **Add More Tests**: Expand test coverage for each entity
+**Commands:**
+- `cy.storeLastCreatedBrand(brandName)` - Store brand name after creation
+- `cy.getLastCreatedBrand()` - Retrieve brand name in issue/article tests
+
+### `cypress/fixtures/last-created-author.json`
+Stores the author name created in `author.cy.js` for use in `issue-article.cy.js`.
+
+**Commands:**
+- `cy.storeLastCreatedAuthor(authorName)` - Store author name after creation
+- `cy.getLastCreatedAuthor()` - Retrieve author name in article edit tests
+
+**Note**: These files are gitignored (see `.gitignore`) as they contain dynamic test data.
+
+## Helper Functions
+
+### Test Data Helpers (`cypress/support/helpers/test-data.js`)
+
+#### `cy.storeLastCreatedBrand(brandName)`
+Stores the brand name for cross-test communication.
+
+#### `cy.getLastCreatedBrand()`
+Retrieves the last created brand name.
+
+#### `cy.storeLastCreatedAuthor(authorName)`
+Stores the author name for cross-test communication.
+
+#### `cy.getLastCreatedAuthor()`
+Retrieves the last created author name.
