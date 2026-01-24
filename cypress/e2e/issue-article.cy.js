@@ -1,4 +1,4 @@
-describe('Issue Creation', () => {
+describe('Issue and Article Creation', () => {
   // Generate unique identifier for test data
   const timestamp = Date.now();
   const issueName = `E2E Issue ${timestamp}`;
