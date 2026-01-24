@@ -5,7 +5,7 @@ module.exports = defineConfig({
     baseUrl: 'https://redsys-stage.sandsmedia.com/', 
     viewportWidth: 1280,
     viewportHeight: 720,
-    video: false,
+    video: true,
     videoCompression: 32,
     videosFolder: 'cypress/videos',
     screenshotsFolder: 'cypress/screenshots',
