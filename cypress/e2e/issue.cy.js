@@ -3,6 +3,7 @@ describe('Issue Creation', () => {
   const timestamp = Date.now();
   const issueName = `E2E Issue ${timestamp}`;
   let brandName;
+  let authorName;
   
   before(() => {
     // Login once before all tests
@@ -273,70 +274,122 @@ describe('Issue Creation', () => {
       cy.url().should('not.include', '/auth');
       cy.get('body').should('not.contain', 'Not Allowed');
       
-      // Step 6: Edit article to upload images
-      cy.log('Clicking Edit button for article');
-      // Wait longer for the page to fully load after article creation
-      cy.wait(3000);
-      
-      // Find and click the edit button using the specific selector
-      cy.get('[style="width: 4.54545%; height: 64px; padding: 0px;"] > .jss1033 > div', { timeout: 15000 })
-        .first() // Ensure we only get one element
-        .should('be.visible')
-        .scrollIntoView()
-        .click();
-      
-      // Wait longer for edit form to load (takes time to open)
-      cy.log('Waiting for edit form to load...');
-      cy.wait(10000); // Increased wait time after clicking edit (10 seconds)
-      
-      // Wait more for form to be fully ready
-      cy.wait(3000);
-      
-      // Upload teaser image to Images dropzone (first dropzone)
-      cy.log('Uploading article teaser image to Images dropzone');
-      // Ensure we only get one element - use first() before scrollIntoView
-      cy.get('.dropzone-base').first().then(($dropzone) => {
-        cy.wrap($dropzone)
-          .scrollIntoView({ duration: 1000 })
+      // Step 6: Get the last created author before editing article
+      cy.getLastCreatedAuthor().then((name) => {
+        authorName = name;
+        cy.log(`Will connect author "${authorName}" to article during edit`);
+        
+        // Edit article to upload images and connect author
+        cy.log('Clicking Edit button for article');
+        // Wait longer for the page to fully load after article creation
+        cy.wait(3000);
+        
+        // Find and click the edit button using the specific selector
+        cy.get('[style="width: 4.54545%; height: 64px; padding: 0px;"] > .jss1033 > div', { timeout: 15000 })
+          .first() // Ensure we only get one element
+          .should('be.visible')
+          .scrollIntoView()
+          .click();
+        
+        // Wait longer for edit form to load (takes time to open)
+        cy.log('Waiting for edit form to load...');
+        cy.wait(10000); // Increased wait time after clicking edit (10 seconds)
+        
+        // Wait more for form to be fully ready
+        cy.wait(3000);
+        
+        // Select author from dropdown (first field, before uploads)
+        cy.log(`Selecting author: ${authorName}`);
+        cy.get('.input-authorIds > .form-group > .drop-down > .css-1pcexqc-container > .css-bg1rzq-control > .css-1hwfws3', { timeout: 15000 })
+          .first()
+          .scrollIntoView({ duration: 1000 }) // Scroll first, then check
           .should('exist')
-          .within(() => {
-            cy.get('input[type="file"]').selectFile('cypress/fixtures/images/brand-generic-teaser.jpg', { force: true });
-          });
-      });
-      cy.wait(2000); // Increased wait after upload
-      
-      // Upload HTML file to HTML-Uploaded dropzone using exact selector
-      cy.log('Uploading article HTML file to HTML-Uploaded dropzone');
-      cy.get(':nth-child(10) > .jss1100 > .jss1102 > .jss1103 > .jss1038 > .jss1104 > .form-group > .col-sm-9 > .dropzone-base', { timeout: 15000 })
-        .should('exist')
-        .then(($dropzone) => {
-          // Ensure we only scroll one element
+          .click();
+        
+        cy.wait(1000); // Wait for dropdown to open
+        
+        // Find and select the author from dropdown options
+        cy.get('body').then(($body) => {
+          const authorOption = $body.find('[id^="react-select-"][id*="-option-"], [role="option"]')
+            .filter((i, el) => Cypress.$(el).text().includes(authorName));
+          
+          if (authorOption.length > 0) {
+            cy.wrap(authorOption.first()).click();
+          } else {
+            // Fallback: try React Select pattern
+            cy.selectReactSelectOption('.input-authorIds .css-bg1rzq-control', authorName);
+          }
+        });
+        
+        cy.wait(1000);
+        
+        // Upload teaser image to Images dropzone (first dropzone)
+        cy.log('Uploading article teaser image to Images dropzone');
+        // Ensure we only get one element - use first() before scrollIntoView
+        cy.get('.dropzone-base').first().then(($dropzone) => {
           cy.wrap($dropzone)
             .scrollIntoView({ duration: 1000 })
+            .should('exist')
             .within(() => {
-              cy.get('input[type="file"]').selectFile('cypress/fixtures/images/report.html', { force: true });
+              cy.get('input[type="file"]').selectFile('cypress/fixtures/images/brand-generic-teaser.jpg', { force: true });
             });
         });
-      cy.wait(2000); // Increased wait after upload
-      
-      // Save the article edits (Speichern)
-      cy.log('Saving article edits');
-      cy.get('button.submit-button[type="submit"]')
-        .first() // Ensure we only get one element
-        .scrollIntoView()
-        .should('contain', 'Speichern')
-        .click();
-      
-      // Wait for save to complete and check we're still logged in (takes time)
-      cy.wait(4000); // Increased wait after saving edits
-      
-      // Verify we're still logged in - check URL and page content
-      cy.url().should('not.include', '/login');
-      cy.url().should('not.include', '/auth');
-      cy.get('body').should('not.contain', 'Not Allowed');
-      
-      // Test complete - issue created, edited, article created and edited successfully, still logged in
-      cy.log(`✅ Issue "${issueName}" created, edited, article created and edited, connected to brand "${brandToUse}"`);
+        cy.wait(2000); // Increased wait after upload
+        
+        // Upload HTML file to HTML-Uploaded dropzone using exact selector
+        cy.log('Uploading article HTML file to HTML-Uploaded dropzone');
+        cy.get(':nth-child(10) > .jss1100 > .jss1102 > .jss1103 > .jss1038 > .jss1104 > .form-group > .col-sm-9 > .dropzone-base', { timeout: 15000 })
+          .should('exist')
+          .then(($dropzone) => {
+            // Ensure we only scroll one element
+            cy.wrap($dropzone)
+              .scrollIntoView({ duration: 1000 })
+              .within(() => {
+                cy.get('input[type="file"]').selectFile('cypress/fixtures/images/report.html', { force: true });
+              });
+          });
+        cy.wait(2000); // Increased wait after upload
+        
+        // Save the article edits with author connection (Speichern)
+        cy.log('Saving article edits with author connection');
+        cy.get('button.submit-button[type="submit"]')
+          .first() // Ensure we only get one element
+          .scrollIntoView()
+          .should('contain', 'Speichern')
+          .click();
+        
+        // Wait for save to complete and check we're still logged in (takes time)
+        cy.wait(4000); // Increased wait after saving edits
+        
+        // Verify we're still logged in - check URL and page content
+        cy.url().should('not.include', '/login');
+        cy.url().should('not.include', '/auth');
+        cy.get('body').should('not.contain', 'Not Allowed');
+        
+        // Step 7: Publish the issue (we're already on the issue detail page)
+        cy.log('Publishing issue');
+        // Wait a bit for the page to be ready after saving
+        cy.wait(2000);
+        
+        // Find publish button by text content (more reliable than dynamic IDs)
+        cy.get('button.button', { timeout: 15000 })
+          .contains('Publish')
+          .first()
+          .should('exist')
+          .scrollIntoView()
+          .click();
+        
+        // Wait much time after publish (as requested)
+        cy.wait(10000); // Long wait after publishing
+        
+        // Verify we're still logged in after publishing
+        cy.url().should('not.include', '/login');
+        cy.url().should('not.include', '/auth');
+        cy.get('body').should('not.contain', 'Not Allowed');
+        
+        // Test complete - issue created, edited, article created and edited with author connected, and published
+        cy.log(`✅ Issue "${issueName}" created, edited, article created and edited with author "${authorName}" connected, published (brand, issue, and article), connected to brand "${brandToUse}"`);
+      });
     });
   });
 });

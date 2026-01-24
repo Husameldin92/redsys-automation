@@ -39,6 +39,7 @@ results/
 
 # Test data files (generated during test runs)
 cypress/fixtures/last-created-brand.json
+cypress/fixtures/last-created-author.json
 
 # Coverage
 coverage/
