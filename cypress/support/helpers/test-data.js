@@ -49,3 +49,28 @@ Cypress.Commands.add('getLastCreatedAuthor', () => {
     return cy.wrap(data.authorName);
   });
 });
+
+/**
+ * Store the last created conference brand name for use in other tests
+ * @param {string} conferenceBrandName - Name of the conference brand that was just created
+ */
+Cypress.Commands.add('storeLastCreatedConferenceBrand', (conferenceBrandName) => {
+  const data = {
+    conferenceBrandName: conferenceBrandName,
+    timestamp: Date.now()
+  };
+  
+  cy.writeFile('cypress/fixtures/last-created-conference-brand.json', data);
+  cy.log(`✅ Stored last created conference brand: ${conferenceBrandName}`);
+});
+
+/**
+ * Get the last created conference brand name from test data
+ * @returns {Cypress.Chainable<string>} The conference brand name
+ */
+Cypress.Commands.add('getLastCreatedConferenceBrand', () => {
+  return cy.readFile('cypress/fixtures/last-created-conference-brand.json').then((data) => {
+    cy.log(`📖 Retrieved last created conference brand: ${data.conferenceBrandName}`);
+    return cy.wrap(data.conferenceBrandName);
+  });
+});
