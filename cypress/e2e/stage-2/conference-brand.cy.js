@@ -295,15 +295,64 @@ describe('Conference Brand Creation and Management', () => {
     // READ
     createSeriesForGenre('READ', 7);
     
-    // TODO: Edit conference brand
-    // - Navigate back to conference brands list
-    // - Find and click on created brand
-    // - Click Edit button
-    // - Verify all genres are present
-    // - Make any necessary edits
+    // Publish conference brand first
+    cy.log('Publishing conference brand');
+    cy.get('button.button', { timeout: 15000 })
+      .contains('Publish')
+      .first()
+      .should('exist')
+      .scrollIntoView()
+      .click();
     
-    // TODO: Publish conference brand
+    cy.wait(3000); // Wait after publishing brand
     
-    cy.log(`✅ Conference Brand "${conferenceBrandName}" created with series and all genres`);
+    // Helper function to publish a series
+    const publishSeries = (seriesName) => {
+      cy.log(`Publishing series: ${seriesName}`);
+      
+      // Find and click on the series name to open it
+      cy.contains(seriesName, { timeout: 10000 })
+        .should('be.visible')
+        .first()
+        .click();
+      
+      cy.wait(2000); // Wait for series detail page to load
+      
+      // Click publish button for the series
+      cy.get('button.button', { timeout: 15000 })
+        .contains('Publish')
+        .first()
+        .should('exist')
+        .scrollIntoView()
+        .click();
+      
+      cy.wait(3000); // Wait after publishing series
+      
+      // Click close button to close the screen
+      cy.log('Closing series screen');
+      cy.get('[style="float: right;"]')
+        .should('be.visible')
+        .click();
+      
+      cy.wait(2000); // Wait after closing
+    };
+    
+    // Publish each series one by one
+    const seriesNames = [
+      `E2E Series Tutorial ${timestamp}`,
+      `E2E Series FSLE ${timestamp}`,
+      `E2E Series CAMP ${timestamp}`,
+      `E2E Series FLEX_CAMP ${timestamp}`,
+      `E2E Series RHEINGOLD ${timestamp}`,
+      `E2E Series COURSE ${timestamp}`,
+      `E2E Series READ ${timestamp}`
+    ];
+    
+    // Publish all series
+    seriesNames.forEach((seriesName) => {
+      publishSeries(seriesName);
+    });
+    
+    cy.log(`✅ Conference Brand "${conferenceBrandName}" created with series and all genres, and all published`);
   });
 });
