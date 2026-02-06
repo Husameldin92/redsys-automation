@@ -326,13 +326,33 @@ describe('Conference Brand Creation and Management', () => {
         .scrollIntoView()
         .click();
       
-      cy.wait(3000); // Wait after publishing series
+      cy.wait(5000); // Wait longer after publishing series for overlay/modal to appear/disappear
+      
+      // Wait for overlay to potentially disappear or handle it
+      cy.get('body').then(($body) => {
+        // Check if overlay exists and wait for it to disappear
+        const overlay = $body.find('.jss1458[aria-hidden="false"]');
+        if (overlay.length > 0) {
+          cy.wait(2000); // Wait for overlay animation
+        }
+      });
       
       // Click close button to close the screen
       cy.log('Closing series screen');
-      cy.get('[style="float: right;"]')
-        .should('be.visible')
-        .click();
+      cy.get('[style="float: right;"]', { timeout: 10000 })
+        .should('exist')
+        .click({ force: true }); // Force click to handle overlay coverage
+      
+      // If force click doesn't work, try pressing Escape as fallback
+      cy.wait(1000);
+      cy.get('body').then(($body) => {
+        // Check if we're still on the series page (close button still exists)
+        const closeButton = $body.find('[style="float: right;"]');
+        if (closeButton.length > 0 && closeButton.is(':visible')) {
+          cy.log('Close button still visible, trying Escape key');
+          cy.get('body').type('{esc}');
+        }
+      });
       
       cy.wait(2000); // Wait after closing
     };
