@@ -130,6 +130,17 @@ describe('Author Creation', () => {
     
     cy.wait(8000); // Wait for upload to complete (5-8 seconds as requested)
     
+    // Upload avatar from ePub (same image)
+    cy.log('Uploading author avatar from ePub');
+    cy.get('.input-avatar > .form-group > .col-sm-9 > .small-image-base')
+      .scrollIntoView()
+      .should('exist')
+      .within(() => {
+        cy.get('input[type="file"]').selectFile('cypress/fixtures/images/author-avatar.jpg', { force: true });
+      });
+    
+    cy.wait(8000); // Wait for ePub avatar upload to complete
+    
     // Save the author edits (Speichern)
     cy.log('Saving author edits');
     cy.get('button.submit-button[type="submit"], button:contains("Save"), [data-testid*="save"], [data-testid*="submit"]')
