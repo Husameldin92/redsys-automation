@@ -280,19 +280,19 @@ describe('Conference Brand Creation and Management', () => {
     // FSLE (second option, index 1 if first is empty, or index 2)
     createSeriesForGenre('FSLE', 2);
     
-    // CAMP
+
     createSeriesForGenre('CAMP', 3);
     
-    // FLEX_CAMP
+    
     createSeriesForGenre('FLEX_CAMP', 4);
     
-    // RHEINGOLD
+    
     createSeriesForGenre('RHEINGOLD', 5);
     
-    // COURSE
+    
     createSeriesForGenre('COURSE', 6);
     
-    // READ
+    
     createSeriesForGenre('READ', 7);
     
     // Publish conference brand first
@@ -304,7 +304,7 @@ describe('Conference Brand Creation and Management', () => {
       .scrollIntoView()
       .click();
     
-    cy.wait(3000); // Wait after publishing brand
+    cy.wait(3000);
     
     // Helper function to publish a series
     const publishSeries = (seriesName) => {
@@ -316,7 +316,7 @@ describe('Conference Brand Creation and Management', () => {
         .first()
         .click();
       
-      cy.wait(2000); // Wait for series detail page to load
+      cy.wait(2000);
       
       // Click publish button for the series
       cy.get('button.button', { timeout: 15000 })
@@ -326,14 +326,14 @@ describe('Conference Brand Creation and Management', () => {
         .scrollIntoView()
         .click();
       
-      cy.wait(5000); // Wait longer after publishing series for overlay/modal to appear/disappear
-      
+        cy.wait(5000);
+        
       // Wait for overlay to potentially disappear or handle it
       cy.get('body').then(($body) => {
         // Check if overlay exists and wait for it to disappear
         const overlay = $body.find('.jss1458[aria-hidden="false"]');
         if (overlay.length > 0) {
-          cy.wait(2000); // Wait for overlay animation
+          cy.wait(2000);
         }
       });
       
@@ -341,12 +341,12 @@ describe('Conference Brand Creation and Management', () => {
       cy.log('Closing series screen');
       cy.get('[style="float: right;"]', { timeout: 10000 })
         .should('exist')
-        .click({ force: true }); // Force click to handle overlay coverage
+        .click({ force: true });
       
       // If force click doesn't work, try pressing Escape as fallback
       cy.wait(1000);
       cy.get('body').then(($body) => {
-        // Check if we're still on the series page (close button still exists)
+        
         const closeButton = $body.find('[style="float: right;"]');
         if (closeButton.length > 0 && closeButton.is(':visible')) {
           cy.log('Close button still visible, trying Escape key');
@@ -354,7 +354,7 @@ describe('Conference Brand Creation and Management', () => {
         }
       });
       
-      cy.wait(2000); // Wait after closing
+      cy.wait(2000);
     };
     
     // Publish each series one by one
