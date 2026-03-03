@@ -150,7 +150,7 @@ describe('Conference Brand Creation and Management', () => {
       .should('be.visible')
       .click();
     
-    cy.wait(500); // Wait for dropdown to open
+    cy.wait(500);
     
     // Select first option (Entwickler)
     cy.get('body').then(($body) => {
@@ -171,7 +171,7 @@ describe('Conference Brand Creation and Management', () => {
     
     cy.wait(500);
     
-    // Save the series (Speichern)
+    
     cy.log('Saving series');
     cy.get('button.submit-button[type="submit"], button:contains("Save"), button:contains("Speichern"), [data-testid*="save"], [data-testid*="submit"]')
       .first()
