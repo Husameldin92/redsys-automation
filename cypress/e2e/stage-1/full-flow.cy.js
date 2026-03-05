@@ -30,10 +30,10 @@ describe('Full Flow: Brand → Author → Issue/Article', () => {
     
   
     //cy.selectReactSelectOption('.drop-down .css-bg1rzq-control', ['entwickler.de', 'devmio'], 2); // to chose entwickler.de
-    //cy.selectReactSelectOption('.drop-down .css-bg1rzq-control', ['devm.io', 'devmio'], 2); // to chose devm.io
-    cy.selectReactSelectOption('.drop-down .css-bg1rzq-control', ['devmio.nl'], 1); // to chose devmio.nl
+    cy.selectReactSelectOption('.drop-down .css-bg1rzq-control', ['devm.io', 'devmio'], 2); // to chose devm.io
+   // cy.selectReactSelectOption('.drop-down .css-bg1rzq-control', ['devmio.nl'], 1); // to chose devmio.nl
 
-    
+
     // Fill additional fields
     cy.get('#frc-introText--918969944').type('This is a test introduction');
     cy.get('#frc-publicationFrequency-1046486578').type('100');
