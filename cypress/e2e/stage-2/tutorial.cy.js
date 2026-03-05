@@ -70,38 +70,17 @@ describe('Tutorial Creation and Management', () => {
     
     // Select Access Type dropdown - choose FS (first option)
     cy.log('Selecting Access Type: FS');
-    cy.get('.input-courseAccessType > .form-group > .drop-down > .css-1pcexqc-container > .css-bg1rzq-control > .css-1hwfws3')
-      .should('be.visible')
-      .scrollIntoView()
-      .click();
-    
-    cy.wait(1500); // Wait for dropdown to open
-    
-    // Wait for options to appear and select first option (FS)
-    cy.get('[role="option"], [id^="react-select-"][id*="-option-"]', { timeout: 10000 })
-      .should('exist')
-      .should('have.length.at.least', 1)
-      .first()
-      .click();
-    
-    cy.wait(500);
+    cy.selectReactSelectOption(
+      '.input-courseAccessType > .form-group > .drop-down > .css-1pcexqc-container > .css-bg1rzq-control > .css-1hwfws3',
+      'FS'
+    );
     
     // Select Apps dropdown - choose first option
     cy.log('Selecting Apps');
-    cy.get('.input-supportedApps > .form-group > .drop-down > .css-1pcexqc-container > .css-bg1rzq-control > .css-1hwfws3')
-      .should('be.visible')
-      .scrollIntoView()
-      .click();
-    
-    cy.wait(1000);
-    // Select first option
-    cy.get('[role="option"], [id^="react-select-"][id*="-option-"]', { timeout: 10000 })
-      .should('exist')
-      .should('have.length.at.least', 1)
-      .first()
-      .click();
-    
-    cy.wait(500);
+    cy.selectReactSelectOption(
+      '.input-supportedApps > .form-group > .drop-down > .css-1pcexqc-container > .css-bg1rzq-control > .css-1hwfws3',
+      null // Will select first option
+    );
     
     // Select Brand dropdown - use last created conference brand
     cy.log('Selecting Brand');
@@ -109,58 +88,19 @@ describe('Tutorial Creation and Management', () => {
       // Wait for any overlay to potentially disappear
       cy.wait(1000);
       
-      cy.get('.css-1szy77t-control > .css-1hwfws3', { timeout: 10000 })
-        .should('exist')
-        .scrollIntoView()
-        .click({ force: true }); // Force click to handle overlay coverage
-      
-      cy.wait(1000);
-      
-      // Find and select the brand
-      cy.get('[role="option"], [id^="react-select-"][id*="-option-"]', { timeout: 10000 })
-        .should('exist')
-        .should('have.length.at.least', 1)
-        .then(($options) => {
-          const brandOption = $options.filter((i, el) => {
-            return Cypress.$(el).text().includes(brandName);
-          });
-          
-          if (brandOption.length > 0) {
-            cy.wrap(brandOption.first()).click();
-          } else {
-            // Fallback: select first option
-            cy.wrap($options.first()).click();
-          }
-        });
+      // Use helper function to select brand
+      cy.selectReactSelectOption(
+        '.css-1szy77t-control > .css-1hwfws3',
+        brandName
+      );
     });
-    
-    cy.wait(500);
     
     // Select Series dropdown - use the tutorial series we created
     cy.log('Selecting Series');
-    cy.get(':nth-child(4) > .css-1pcexqc-container > .css-bg1rzq-control > .css-1hwfws3')
-      .should('be.visible')
-      .click();
-    
-    cy.wait(500);
-    
-    // Find and select the Tutorial series
-    cy.get('body').then(($body) => {
-      const seriesOptions = $body.find('[role="option"], [id^="react-select-"][id*="-option-"]');
-      const tutorialSeriesOption = seriesOptions.filter((i, el) => {
-        const text = Cypress.$(el).text().toLowerCase();
-        return text.includes('tutorial');
-      });
-      
-      if (tutorialSeriesOption.length > 0) {
-        cy.wrap(tutorialSeriesOption.first()).click();
-      } else if (seriesOptions.length >= 1) {
-        // Fallback: select first option
-        cy.wrap(seriesOptions.first()).click();
-      }
-    });
-    
-    cy.wait(500);
+    cy.selectReactSelectOption(
+      ':nth-child(4) > .css-1pcexqc-container > .css-bg1rzq-control > .css-1hwfws3',
+      'Tutorial'
+    );
     
     // Scroll down to see slug field
     cy.log('Scrolling to slug field');
@@ -263,13 +203,11 @@ describe('Tutorial Creation and Management', () => {
       .scrollIntoView()
       .click();
     
-    cy.wait(1000); // Wait for dropdown to open
+    cy.wait(1000);
     
-    // Select English (skip first empty option, select second option)
+    // Use helper but handle empty first option
     cy.get('body').then(($body) => {
-      const languageOptions = $body.find('[role="option"], [id^="react-select-"][id*="-option-"]');
-      
-      // Try to find English by text first
+      const languageOptions = $body.find('[role="option"]');
       const englishOption = languageOptions.filter((i, el) => {
         return Cypress.$(el).text().toLowerCase().includes('english');
       });
@@ -277,15 +215,12 @@ describe('Tutorial Creation and Management', () => {
       if (englishOption.length > 0) {
         cy.wrap(englishOption.first()).click();
       } else if (languageOptions.length >= 2) {
-        // If English not found, select second option (skip first empty)
+        // Skip first empty option, select second
         cy.wrap(languageOptions.eq(1)).click();
-      } else if (languageOptions.length >= 1) {
-        // Fallback: select first available option
+      } else {
         cy.wrap(languageOptions.first()).click();
       }
     });
-    
-    cy.wait(500);
     
     // Select Start Date from calendar
     cy.log('Selecting Start Date from calendar');
@@ -319,31 +254,10 @@ describe('Tutorial Creation and Management', () => {
     
     // Select Video Type dropdown - choose NONE
     cy.log('Selecting Video Type: NONE');
-    cy.get('.input-videoType > .jss479 > .jss522 > .jss552 > .jss553')
-      .should('be.visible')
-      .scrollIntoView()
-      .click();
-    
-    cy.wait(1000); // Wait for dropdown to open
-    
-    // Find and select NONE option
-    cy.get('body').then(($body) => {
-      const videoTypeOptions = $body.find('[role="option"], [id^="react-select-"][id*="-option-"]');
-      
-      // Try to find NONE by text
-      const noneOption = videoTypeOptions.filter((i, el) => {
-        return Cypress.$(el).text().toLowerCase().includes('none');
-      });
-      
-      if (noneOption.length > 0) {
-        cy.wrap(noneOption.first()).click();
-      } else if (videoTypeOptions.length >= 1) {
-        // Fallback: select first available option
-        cy.wrap(videoTypeOptions.first()).click();
-      }
-    });
-    
-    cy.wait(500);
+    cy.selectReactSelectOptionByRole(
+      '.input-videoType > .jss479 > .jss522 > .jss552 > .jss553',
+      'NONE'
+    );
     
     // Save the lesson (Speichern)
     cy.log('Saving lesson');
@@ -356,7 +270,7 @@ describe('Tutorial Creation and Management', () => {
     // Wait for save to complete
     cy.wait(2000);
     
-    // Click General Information button
+
     cy.log('Clicking General Information button');
     cy.get('[style="margin-top:2%;margin-left:.5%;margin-right:.5%"] > :nth-child(1) > :nth-child(1) > .MuiButton-label-7')
       .should('be.visible')
@@ -367,16 +281,16 @@ describe('Tutorial Creation and Management', () => {
     // Click Revise button
     cy.log('Clicking Revise button');
     cy.get(':nth-child(4) > :nth-child(1) > .jss7')
-      .should('be.visible')
-      .click();
+      .should('exist')
+      .click({ force: true }); // Force click to handle overlay coverage
     
     cy.wait(3000); // Wait a bit after clicking revise
     
     // Click the same button again to publish
     cy.log('Clicking publish button');
     cy.get(':nth-child(4) > :nth-child(1) > .jss7')
-      .should('be.visible')
-      .click();
+      .should('exist')
+      .click({ force: true }); // Force click to handle overlay coverage
     
     cy.wait(2000); // Wait after publishing
     
