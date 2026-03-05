@@ -26,8 +26,10 @@ describe('Brand Creation and Management', () => {
     cy.get('#frc-price-1858698673').type('100');
     cy.get('#frc-size--483674448').type('100');
     
-    // Select Apps dropdown
-    cy.selectReactSelectOption('.drop-down .css-bg1rzq-control', ['entwickler.de', 'devmio'], 2);
+ 
+    //cy.selectReactSelectOption('.drop-down .css-bg1rzq-control', ['entwickler.de', 'devmio'], 2); // to chose entwickler.de
+    cy.selectReactSelectOption('.drop-down .css-bg1rzq-control', ['devm.io', 'devmio'], 2); // to chose devm.io
+    //cy.selectReactSelectOption('.drop-down .css-bg1rzq-control', ['devmio.nl'], 1); // to chose devmio.nl
     
     // Fill additional fields
     cy.get('#frc-introText--918969944').type('This is a test introduction');
