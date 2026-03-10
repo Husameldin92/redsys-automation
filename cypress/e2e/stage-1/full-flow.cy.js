@@ -28,7 +28,7 @@ describe('Full Flow: Brand → Author → Issue/Article', () => {
     cy.get('#frc-price-1858698673').type('100');
     cy.get('#frc-size--483674448').type('100');
     
-  
+  // chose one of the following options: (the first option will chose entwickle)
     //cy.selectReactSelectOption('.drop-down .css-bg1rzq-control', ['entwickler.de', 'devmio'], 2); // to chose entwickler.de
     cy.selectReactSelectOption('.drop-down .css-bg1rzq-control', ['devm.io', 'devmio'], 2); // to chose devm.io
    // cy.selectReactSelectOption('.drop-down .css-bg1rzq-control', ['devmio.nl'], 1); // to chose devmio.nl

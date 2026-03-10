@@ -44,6 +44,9 @@ npx cypress run --spec "cypress/e2e/brand.cy.js,cypress/e2e/author.cy.js"
 # Run all files matching a pattern
 npx cypress run --spec "cypress/e2e/*.cy.js"
 
+# run with debug mode 
+DEBUG=cypress:* npx cypress open
+
 # Run all files except legacy combined test
 npx cypress run --spec "cypress/e2e/{brand,issue,author,article}.cy.js"
 ```

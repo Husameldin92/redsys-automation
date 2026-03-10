@@ -1,37 +1,43 @@
-describe('Tutorial Creation and Management', () => {
+describe('FSLE Creation and Management', () => {
 
   const timestamp = Date.now();
-  const tutorialName = `E2E Tutorial ${timestamp}`;
+  const fsleName = `E2E FSLE ${timestamp}`;
   
   before(() => {
     cy.loginAs('admin');
   });
   
-  it('should create a new tutorial', () => {
-    cy.log('Creating Tutorial');
+  it('should create a new FSLE', () => {
+    cy.log('Creating FSLE');
     cy.visit('/live_events?option=blockbusters');
     cy.contains('Not Allowed').should('not.exist');
     cy.wait(2000);
     
+    cy.log('Clicking FSLES tab');
+    cy.get('.subMenu > :nth-child(3) > .MuiButton-label-7')
+      .should('be.visible')
+      .click();
     
-    cy.log('Clicking NEW TUTORIAL button');
+    cy.wait(2000); // Wait for FSLES section to load
+    
+    cy.log('Clicking NEW FSLE button');
     cy.get('body').then(($body) => {
-      const newTutorialButton = $body.find('button:contains("NEW TUTORIAL"), a:contains("NEW TUTORIAL"), button:contains("New Tutorial"), a:contains("New Tutorial"), [data-testid*="new-tutorial"], [data-testid*="tutorial-new"]')
+      const newFSLEButton = $body.find('button:contains("NEW FSLE"), a:contains("NEW FSLE"), button:contains("New FSLE"), a:contains("New FSLE"), [data-testid*="new-fsle"], [data-testid*="fsle-new"]')
         .filter((i, el) => {
           const text = Cypress.$(el).text().toLowerCase();
-          return text.includes('new') && text.includes('tutorial');
+          return text.includes('new') && (text.includes('fsle') || text.includes('fs le'));
         });
       
-      if (newTutorialButton.length > 0) {
-        cy.wrap(newTutorialButton.first()).should('be.visible').click();
+      if (newFSLEButton.length > 0) {
+        cy.wrap(newFSLEButton.first()).should('be.visible').click();
       } else {
         // Fallback: try common selectors
-        cy.get('button[type="button"], a[href*="tutorial"]').contains('NEW TUTORIAL', { matchCase: false }).click();
+        cy.get('button[type="button"], a[href*="fsle"]').contains('NEW FSLE', { matchCase: false }).click();
       }
     });
     
 
-    cy.log('Waiting for tutorial form to load');
+    cy.log('Waiting for FSLE form to load');
     cy.wait(5000); 
     
 
@@ -41,7 +47,7 @@ describe('Tutorial Creation and Management', () => {
     
     cy.wait(2000);
     
-    // Scroll down to see the form fields
+
     cy.log('Scrolling down to see form fields');
     cy.scrollTo(0, 500);
     cy.wait(1000);
@@ -52,21 +58,21 @@ describe('Tutorial Creation and Management', () => {
       .scrollIntoView()
       .should('be.visible')
       .clear()
-      .type(tutorialName);
+      .type(fsleName);
     
     // Fill Slogan field
     cy.log('Filling Slogan');
     cy.get('#frc-slogan--66047816')
       .should('be.visible')
       .clear()
-      .type(`E2E Tutorial Slogan ${timestamp}`);
+      .type(`E2E FSLE Slogan ${timestamp}`);
     
     // Fill Description field
     cy.log('Filling Description');
     cy.get('#frc-description--837447522')
       .should('be.visible')
       .clear()
-      .type(`This is a test description for E2E Tutorial ${timestamp}`);
+      .type(`This is a test description for E2E FSLE ${timestamp}`);
     
     // Select Access Type dropdown - choose FS (first option)
     cy.log('Selecting Access Type: FS');
@@ -82,39 +88,51 @@ describe('Tutorial Creation and Management', () => {
       null // Will select first option
     );
     
-    // Select Brand dropdown - use last created conference brand
+    // Select Brand dropdown - use last created conference brand (same as tutorial)
     cy.log('Selecting Brand');
     cy.getLastCreatedConferenceBrand().then((brandName) => {
-      // Wait for any overlay to potentially disappear
       cy.wait(1000);
-      
-      // Use helper function to select brand
       cy.selectReactSelectOption(
         '.css-1szy77t-control > .css-1hwfws3',
         brandName
       );
     });
     
-    // Select Series dropdown - use the Tutorial series from last created conference brand
+    // Select Series dropdown - use the FSLE series from last created conference brand
     cy.log('Selecting Series');
-    cy.getLastCreatedConferenceBrandSeries('Tutorial').then((seriesName) => {
+    cy.getLastCreatedConferenceBrandSeries('FSLE').then((seriesName) => {
       cy.selectReactSelectOption(
         ':nth-child(4) > .css-1pcexqc-container > .css-bg1rzq-control > .css-1hwfws3',
         seriesName
       );
     });
     
-    // Scroll down to see slug field
+    // Select End Date (unpublishing date) at FSLE/course level
+    cy.log('Selecting End Date from calendar');
+    cy.get('.input-unpublishingDate input.form-control')
+      .first()
+      .should('be.visible')
+      .scrollIntoView()
+      .click();
+    cy.wait(500);
+    // Scope to this calendar only - click next month then first available day
+    cy.get('.input-unpublishingDate .rdtNext').first().click();
+    cy.wait(300);
+    cy.get('.input-unpublishingDate .rdtDay:not(.rdtOld)').first().click();
+    cy.wait(500);
+    
+    // Scroll down to see slug field (FSLE has extra field, need more scroll)
     cy.log('Scrolling to slug field');
-    cy.scrollTo(0, 600);
+    cy.scrollTo(0, 800);
     cy.wait(1000);
     
-    // Fill Slug field
+    // Fill Slug field - scroll into view first
     cy.log('Filling Slug');
     cy.get('#frc-slug-1053376469')
+      .scrollIntoView()
       .should('be.visible')
       .clear()
-      .type(tutorialName.toLowerCase().replace(/ /g, '-'));
+      .type(fsleName.toLowerCase().replace(/ /g, '-'));
     
     // Fill Colour code field
     cy.log('Filling Colour Code');
@@ -138,8 +156,8 @@ describe('Tutorial Creation and Management', () => {
     
     cy.wait(500);
     
-    // Save the tutorial (Speichern)
-    cy.log('Saving tutorial');
+    // Save the FSLE (Speichern)
+    cy.log('Saving FSLE');
     cy.get('button.submit-button[type="submit"], button:contains("Save"), button:contains("Speichern"), [data-testid*="save"], [data-testid*="submit"]')
       .first()
       .scrollIntoView()
@@ -147,16 +165,38 @@ describe('Tutorial Creation and Management', () => {
       .click();
     cy.wait(2000);
     
-    // Store the tutorial name for use in other tests
-    cy.storeLastCreatedTutorial(tutorialName);
+    // Store the FSLE name for use in other tests
+    cy.storeLastCreatedFSLE(fsleName);
     
-    // Find and click on the created tutorial from search results
-    cy.contains(tutorialName, { timeout: 10000 })
+    // Navigate back to FSLEs list
+    cy.log('Opening FSLE to add lessons');
+    cy.visit('/live_events?option=blockbusters');
+    cy.wait(2000);
+    
+    // Click FSLES tab again to show FSLEs list
+    cy.log('Clicking FSLES tab');
+    cy.get('.subMenu > :nth-child(3) > .MuiButton-label-7')
+      .should('be.visible')
+      .click();
+    
+    cy.wait(2000); // Wait for FSLES section to load
+    
+    // Search for the created FSLE using search field
+    cy.log('Searching for FSLE');
+    cy.get('.datatable-search')
+      .should('be.visible')
+      .clear()
+      .type(fsleName);
+    
+    cy.wait(2000); // Wait for search results
+    
+    // Find and click on the created FSLE from search results
+    cy.contains(fsleName, { timeout: 10000 })
       .should('be.visible')
       .first()
       .click();
     
-    cy.wait(2000); // Wait for tutorial detail page to load
+    cy.wait(2000); // Wait for FSLE detail page to load
     
     // Click on Lessons tab
     cy.log('Clicking Lessons tab');
@@ -201,9 +241,9 @@ describe('Tutorial Creation and Management', () => {
       .clear()
       .type(`This is a test description for E2E Lesson ${timestamp}`);
     
-    // Select Language dropdown - choose English (skip first empty option)
+
     cy.log('Selecting Language: English');
-    cy.get('.input-language > .jss479 > .jss522 > .jss552 > .jss553')
+    cy.get('.input-language > .jss347 > .jss390 > .jss420 > .jss421')
       .should('be.visible')
       .scrollIntoView()
       .click();
@@ -301,6 +341,6 @@ describe('Tutorial Creation and Management', () => {
     
     cy.wait(2000); // Wait after publishing
     
-    cy.log(`✅ Tutorial "${tutorialName}" created with lesson and published successfully`);
+    cy.log(`✅ FSLE "${fsleName}" created with lesson and published successfully`);
   });
 });

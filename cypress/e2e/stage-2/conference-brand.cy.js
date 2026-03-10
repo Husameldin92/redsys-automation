@@ -78,7 +78,6 @@ describe('Conference Brand Creation and Management', () => {
     // TODO: Series selection/creation
     // - Add all 6 genres: Tutorial, FSLE, Camps, Flex_camps, Rheingold, Course
     
-    // Save the conference brand (Speichern)
     cy.log('Saving conference brand');
     cy.get('button.submit-button[type="submit"], button:contains("Save"), button:contains("Speichern"), [data-testid*="save"], [data-testid*="submit"]')
       .first()
@@ -86,47 +85,41 @@ describe('Conference Brand Creation and Management', () => {
       .should('contain', 'Speichern')
       .click();
     
-    // Wait for save to complete
+
     cy.wait(2000);
     
-    // Store the conference brand name for use in other tests (after saving conference brand)
-    cy.storeLastCreatedConferenceBrand(conferenceBrandName);
+    // Store the conference brand name and timestamp for use in other tests (series names use this timestamp)
+    cy.storeLastCreatedConferenceBrand(conferenceBrandName, timestamp);
     
-    // Click create new series button
     cy.log('Clicking create new series button');
     cy.get('[style="display: flex; align-items: center; gap: 12px;"] > .modal-trigger > .jss464')
       .should('be.visible')
       .click();
     
-    cy.wait(2000); // Wait for series form to load
-    
-    // Fill Series Name field
+    cy.wait(2000); 
+
     cy.log('Filling Series Name');
     cy.get('#frc-name-1048423413')
       .should('be.visible')
       .clear()
       .type(seriesName);
     
-    // Fill Series Slug field
     cy.log('Filling Series Slug');
     cy.get('#frc-slug-1053376469')
       .should('be.visible')
       .clear()
       .type(seriesName.toLowerCase().replace(/ /g, '-'));
     
-    // Select Genre - choose Tutorial (first option)
     cy.log('Selecting Genre: Tutorial');
     cy.get('.input-genre > .form-group > .drop-down > .css-1pcexqc-container > .css-bg1rzq-control > .css-1hwfws3')
       .should('be.visible')
       .click();
     
-    cy.wait(500); // Wait for dropdown to open
+    cy.wait(500); 
     
-    // Select Tutorial option (skip first empty option if exists)
     cy.get('body').then(($body) => {
       const genreOptions = $body.find('[role="option"], [id^="react-select-"][id*="-option-"]');
       
-      // Try to find Tutorial by text first
       const tutorialOption = genreOptions.filter((i, el) => {
         return Cypress.$(el).text().toLowerCase().includes('tutorial');
       });
@@ -179,46 +172,38 @@ describe('Conference Brand Creation and Management', () => {
       .should('contain', 'Speichern')
       .click();
     
-    // Wait for save to complete
     cy.wait(2000);
     
-    // Helper function to create a series for a specific genre
     const createSeriesForGenre = (genreName, genreIndex) => {
-      // Click create new series button
       cy.log(`Creating series for ${genreName}`);
       cy.get('[style="display: flex; align-items: center; gap: 12px;"] > .modal-trigger > .jss464')
         .should('be.visible')
         .click();
       
-      cy.wait(2000); // Wait for series form to load
+      cy.wait(2000); 
       
-      // Fill Series Name field (include genre name)
       cy.log(`Filling Series Name for ${genreName}`);
       cy.get('#frc-name-1048423413')
         .should('be.visible')
         .clear()
         .type(`E2E Series ${genreName} ${timestamp}`);
       
-      // Fill Series Slug field
       cy.log(`Filling Series Slug for ${genreName}`);
       cy.get('#frc-slug-1053376469')
         .should('be.visible')
         .clear()
         .type(`e2e-series-${genreName.toLowerCase().replace(/_/g, '-')}-${timestamp}`);
       
-      // Select Genre
       cy.log(`Selecting Genre: ${genreName}`);
       cy.get('.input-genre > .form-group > .drop-down > .css-1pcexqc-container > .css-bg1rzq-control > .css-1hwfws3')
         .should('be.visible')
         .click();
       
-      cy.wait(500); // Wait for dropdown to open
+      cy.wait(500);
       
-      // Select genre option (skip first empty option if exists)
       cy.get('body').then(($body) => {
         const genreOptions = $body.find('[role="option"], [id^="react-select-"][id*="-option-"]');
         
-        // Try to find genre by text first
         const genreOption = genreOptions.filter((i, el) => {
           const text = Cypress.$(el).text().toLowerCase();
           return text.includes(genreName.toLowerCase()) || text.includes(genreName.toLowerCase().replace(/_/g, ' '));
@@ -227,29 +212,24 @@ describe('Conference Brand Creation and Management', () => {
         if (genreOption.length > 0) {
           cy.wrap(genreOption.first()).click();
         } else if (genreOptions.length > genreIndex) {
-          // If genre not found by text, select by index (skip first empty if exists)
           cy.wrap(genreOptions.eq(genreIndex)).click();
         } else if (genreOptions.length >= 1) {
-          // Fallback: select first available option
           cy.wrap(genreOptions.first()).click();
         }
       });
       
       cy.wait(500);
       
-      // Select App Visibility - choose Entwickler
       cy.log('Selecting App Visibility: Entwickler');
       cy.get('.input-visibleInApps > .form-group > .drop-down > .css-1pcexqc-container > .css-bg1rzq-control > .css-1hwfws3')
         .should('be.visible')
         .click();
       
-      cy.wait(500); // Wait for dropdown to open
+      cy.wait(500); 
       
-      // Select Entwickler option
       cy.get('body').then(($body) => {
         const appOptions = $body.find('[role="option"], [id^="react-select-"][id*="-option-"]');
         
-        // Try to find Entwickler by text first
         const entwicklerOption = appOptions.filter((i, el) => {
           return Cypress.$(el).text().toLowerCase().includes('entwickler');
         });
@@ -257,14 +237,12 @@ describe('Conference Brand Creation and Management', () => {
         if (entwicklerOption.length > 0) {
           cy.wrap(entwicklerOption.first()).click();
         } else if (appOptions.length >= 1) {
-          // Fallback: select first available option
           cy.wrap(appOptions.first()).click();
         }
       });
       
       cy.wait(500);
       
-      // Save the series (Speichern)
       cy.log(`Saving ${genreName} series`);
       cy.get('button.submit-button[type="submit"], button:contains("Save"), button:contains("Speichern"), [data-testid*="save"], [data-testid*="submit"]')
         .first()
@@ -272,12 +250,9 @@ describe('Conference Brand Creation and Management', () => {
         .should('contain', 'Speichern')
         .click();
       
-      // Wait for save to complete
       cy.wait(2000);
     };
     
-    // Create series for remaining genres
-    // FSLE (second option, index 1 if first is empty, or index 2)
     createSeriesForGenre('FSLE', 2);
     
 

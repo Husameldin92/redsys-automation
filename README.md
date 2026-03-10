@@ -51,3 +51,5 @@ cypress/
 
 - `cy.loginAs(userType)` - Login as specified user (default: 'admin')
 - `cy.uploadByTestId(testId, filePath)` - Upload file by test ID
+
+
