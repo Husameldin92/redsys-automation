@@ -107,19 +107,24 @@ describe('FSLE Creation and Management', () => {
       );
     });
     
-    // Select End Date (unpublishing date) at FSLE/course level
+    // Select End Date (unpublishing date) at FSLE/course level - same logic as Start Date, future date
     cy.log('Selecting End Date from calendar');
-    cy.get('.input-unpublishingDate input.form-control')
-      .first()
+    cy.get('.input-unpublishingDate .rdt .form-control')
       .should('be.visible')
       .scrollIntoView()
       .click();
     cy.wait(500);
-    // Scope to this calendar only - click next month then first available day
-    cy.get('.input-unpublishingDate .rdtNext').first().click();
-    cy.wait(300);
-    cy.get('.input-unpublishingDate .rdtDay:not(.rdtOld)').first().click();
+    cy.get('.input-unpublishingDate .rdtNext').first().click(); // Next month for future date
     cy.wait(500);
+    cy.get('.input-unpublishingDate').then(($container) => {
+      const todayDate = $container.find('.rdtDay.rdtToday');
+      if (todayDate.length > 0) {
+        cy.wrap(todayDate.first()).click();
+      } else {
+        cy.wrap($container.find('.rdtDay:not(.rdtOld)').first()).click();
+      }
+    });
+    cy.wait(1000);
     
     // Scroll down to see slug field (FSLE has extra field, need more scroll)
     cy.log('Scrolling to slug field');
@@ -294,7 +299,23 @@ describe('FSLE Creation and Management', () => {
       }
     });
     
-    
+    // Select End Date from calendar (lesson level) - same logic as Start Date, future date
+    cy.log('Selecting End Date from calendar');
+    cy.get('.input-endDate > :nth-child(1) > [style="width: 75%; float: left;"] > .rdt > .form-control')
+      .should('be.visible')
+      .scrollIntoView()
+      .click();
+    cy.wait(500);
+    cy.get('.input-endDate .rdtNext').first().click(); // Next month for future date
+    cy.wait(500);
+    cy.get('.input-endDate').then(($container) => {
+      const todayDate = $container.find('.rdtDay.rdtToday');
+      if (todayDate.length > 0) {
+        cy.wrap(todayDate.first()).click();
+      } else {
+        cy.wrap($container.find('.rdtDay:not(.rdtOld)').first()).click();
+      }
+    });
     cy.wait(1000);
     
     // Select Video Type dropdown - choose NONE (JSS classes change; use stable .input-videoType + fallbacks)
