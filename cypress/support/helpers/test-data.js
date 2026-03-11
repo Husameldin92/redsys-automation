@@ -170,3 +170,28 @@ Cypress.Commands.add('getLastCreatedCamps', () => {
     return cy.wrap(data.campsName);
   });
 });
+
+/**
+ * Store the last created Flex Camps name for use in other tests
+ * @param {string} flexCampsName - Name of the Flex Camps that was just created
+ */
+Cypress.Commands.add('storeLastCreatedFlexCamps', (flexCampsName) => {
+  const data = {
+    flexCampsName: flexCampsName,
+    timestamp: Date.now()
+  };
+  
+  cy.writeFile('cypress/fixtures/last-created-flex-camps.json', data);
+  cy.log(`✅ Stored last created Flex Camps: ${flexCampsName}`);
+});
+
+/**
+ * Get the last created Flex Camps name from test data
+ * @returns {Cypress.Chainable<string>} The Flex Camps name
+ */
+Cypress.Commands.add('getLastCreatedFlexCamps', () => {
+  return cy.readFile('cypress/fixtures/last-created-flex-camps.json').then((data) => {
+    cy.log(`📖 Retrieved last created Flex Camps: ${data.flexCampsName}`);
+    return cy.wrap(data.flexCampsName);
+  });
+});
