@@ -145,3 +145,28 @@ Cypress.Commands.add('getLastCreatedFSLE', () => {
     return cy.wrap(data.fsleName);
   });
 });
+
+/**
+ * Store the last created Camps name for use in other tests
+ * @param {string} campsName - Name of the Camps that was just created
+ */
+Cypress.Commands.add('storeLastCreatedCamps', (campsName) => {
+  const data = {
+    campsName: campsName,
+    timestamp: Date.now()
+  };
+  
+  cy.writeFile('cypress/fixtures/last-created-camps.json', data);
+  cy.log(`✅ Stored last created Camps: ${campsName}`);
+});
+
+/**
+ * Get the last created Camps name from test data
+ * @returns {Cypress.Chainable<string>} The Camps name
+ */
+Cypress.Commands.add('getLastCreatedCamps', () => {
+  return cy.readFile('cypress/fixtures/last-created-camps.json').then((data) => {
+    cy.log(`📖 Retrieved last created Camps: ${data.campsName}`);
+    return cy.wrap(data.campsName);
+  });
+});

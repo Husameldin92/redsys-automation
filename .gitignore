@@ -43,6 +43,7 @@ cypress/fixtures/last-created-author.json
 cypress/fixtures/last-created-conference-brand.json
 cypress/fixtures/last-created-tutorial.json
 cypress/fixtures/last-created-fsle.json
+cypress/fixtures/last-created-camps.json
 
 # Coverage
 coverage/
