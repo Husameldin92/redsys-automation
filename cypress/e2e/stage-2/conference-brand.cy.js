@@ -49,7 +49,7 @@ describe('Conference Brand Creation and Management', () => {
     
     // Click in the topic list to open dropdown
     cy.log('Selecting first topic');
-    cy.get('.jss324')
+    cy.get('.jss341')
       .should('be.visible')
       .click();
     
@@ -92,7 +92,7 @@ describe('Conference Brand Creation and Management', () => {
     cy.storeLastCreatedConferenceBrand(conferenceBrandName, timestamp);
     
     cy.log('Clicking create new series button');
-    cy.get('[style="display: flex; align-items: center; gap: 12px;"] > .modal-trigger > .jss464')
+    cy.get('[style="display: flex; align-items: center; gap: 12px;"] > :nth-child(1)')
       .should('be.visible')
       .click();
     
@@ -176,7 +176,7 @@ describe('Conference Brand Creation and Management', () => {
     
     const createSeriesForGenre = (genreName, genreIndex) => {
       cy.log(`Creating series for ${genreName}`);
-      cy.get('[style="display: flex; align-items: center; gap: 12px;"] > .modal-trigger > .jss464')
+      cy.get('[style="display: flex; align-items: center; gap: 12px;"] > :nth-child(1)')  
         .should('be.visible')
         .click();
       

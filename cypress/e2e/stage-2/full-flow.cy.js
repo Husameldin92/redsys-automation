@@ -31,7 +31,7 @@ describe('Full Flow: Conference Brand → Tutorial → FSLE → Camps → Flex C
     cy.wait(1000);
 
     cy.log('Selecting first topic');
-    cy.get('.jss324').should('be.visible').click();
+    cy.get('.jss341').should('be.visible').click();
     cy.wait(500);
 
     cy.get('body').then(($body) => {
@@ -57,7 +57,7 @@ describe('Full Flow: Conference Brand → Tutorial → FSLE → Camps → Flex C
     cy.storeLastCreatedConferenceBrand(conferenceBrandName, timestamp);
 
     cy.log('Clicking create new series button');
-    cy.get('[style="display: flex; align-items: center; gap: 12px;"] > .modal-trigger > .jss464').should('be.visible').click();
+    cy.get('[style="display: flex; align-items: center; gap: 12px;"] > :nth-child(1)').should('be.visible').click();
     cy.wait(2000);
 
     cy.log('Filling Series Name');
@@ -108,7 +108,7 @@ describe('Full Flow: Conference Brand → Tutorial → FSLE → Camps → Flex C
 
     const createSeriesForGenre = (genreName, genreIndex) => {
       cy.log(`Creating series for ${genreName}`);
-      cy.get('[style="display: flex; align-items: center; gap: 12px;"] > .modal-trigger > .jss464').should('be.visible').click();
+      cy.get('[style="display: flex; align-items: center; gap: 12px;"] > :nth-child(1)').should('be.visible').click();
       cy.wait(2000);
 
       cy.get('#frc-name-1048423413').should('be.visible').clear().type(`E2E Series ${genreName} ${timestamp}`);
